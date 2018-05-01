@@ -40,6 +40,11 @@ def dec(n):
 
 # If we want the gcd function to also work for negative numbers, we have to 'fix' integer division in Python
 # as they way it is implemented (for negative numbers) does not actually correspond to Euclidean division
+# What I am doing below is to define Euclidean division according to the Raymond T. Boute definition
+# (https://en.wikipedia.org/wiki/Modulo_operation). This is the definition that is more consistent with
+# number theory as attested by the fact that the Euclidean GCD computation algorithm (that also produces,
+# in addition to the GCD, the r and s values) works for negative numbers only with the Raymond T. Boute definition
+# of Euclidean division.
 def euclidean_division(a, b):
     '''
         Returns quotient and remainder of a divided by b according to the Euclidean division algorihm.
@@ -70,6 +75,21 @@ def euclidean_division(a, b):
         (-5, 5)
     '''
 
+    # This is exactly the Raymond T. Boute definition of Euclidean
+    # division as found in Wikipedia.
+    def alternate_impl(a, b):
+        def sgn(b):
+            assert b!=0
+            if (b>0):
+                return 1
+            else:
+                return -1
+        q = sgn(b)*floor(a/abs(b))
+        r = a - abs(b)*floor(a/abs(b))
+        return (q, r)
+
+    # below follows my own implementation which I assert (just before returning)
+    # that yields results identical to the Raymond T. Boute definition
     if (b==0):
         raise ValueError('b cannot be zero')
     rv = None
@@ -80,6 +100,7 @@ def euclidean_division(a, b):
     assert rv[1] >= 0
     assert rv[1] < abs(b), 'when dividing {} by {} a remainder of {} was computed - which is not less than the absolute value of {} ({})'.format(a, b, rv[1], b, abs(b))
     assert b*rv[0]+rv[1]==a
+    assert rv==alternate_impl(a, b)
     return rv
 
 
